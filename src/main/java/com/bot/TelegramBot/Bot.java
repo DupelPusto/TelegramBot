@@ -1,5 +1,6 @@
 package com.bot.TelegramBot;
 
+import com.bot.TelegramBot.AdminComponents.AdminHandler;
 import com.bot.TelegramBot.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,8 +16,10 @@ public class Bot extends TelegramLongPollingBot {
     private static final String HELP = "/help";
     private static final String LINK = "/link";
     private static final String SCHEDULE = "/schedule";
+    private static final String ADMIN = "/admin";
 
     private final ScheduleService scheduleService;
+    private final AdminHandler adminHandler;
 
     @Value("${bot.name}")
     private String botName;
@@ -24,27 +27,31 @@ public class Bot extends TelegramLongPollingBot {
     @Value("${admin.id}")
     private Long adminId;
 
-    public Bot(@Value("${bot.token}") String botToken, ScheduleService scheduleService){
+    public Bot(@Value("${bot.token}") String botToken, ScheduleService scheduleService, AdminHandler adminHandler){
         super(botToken);
         this.scheduleService = scheduleService;
+        this.adminHandler = adminHandler;
     }
 
     @Override
     public void onUpdateReceived(Update update) {
         try {
             if (update.hasMessage() && update.getMessage().hasText()) {
-
-                Long chatId = update.getMessage().getChatId();
-                switch (update.getMessage().getText()) {
-                    case START:
-                        execute(sendMessage(chatId, startMessage(update.getMessage().getChat().getFirstName())));
-                        break;
-                    case HELP:
-                        execute(sendMessage(chatId, getHelp()));
-                        break;
-                    case SCHEDULE:
-                        String response = scheduleService.getScheduleForToday(chatId);
-                        execute(sendMessage(chatId, response));
+                if (update.getMessage().getChatId().equals(adminId)) {
+                    execute(adminHandler.adminHandler(update));
+                } else {
+                    Long chatId = update.getMessage().getChatId();
+                    switch (update.getMessage().getText()) {
+                        case START:
+                            execute(sendMessage(chatId, startMessage(update.getMessage().getChat().getFirstName())));
+                            break;
+                        case HELP:
+                            execute(sendMessage(chatId, getHelp()));
+                            break;
+                        case SCHEDULE:
+                            String response = scheduleService.getScheduleForToday(chatId);
+                            execute(sendMessage(chatId, response));
+                    }
                 }
             }
 
@@ -72,5 +79,13 @@ public class Bot extends TelegramLongPollingBot {
         sm.setChatId(id);
         sm.setText(text);
         return sm;
+    }
+
+    public void sender(SendMessage message){
+        try{
+            execute(message);
+        }catch (TelegramApiException e){
+            throw new RuntimeException("TelegramAPI Exception");
+        }
     }
 }
