@@ -20,6 +20,8 @@ public class ScheduleItem {
 
     private Integer lessonNumber;
 
+    private String auditory;
+
     @ManyToOne
     @JoinColumn(name = "subject_id")
     private Subject subject;

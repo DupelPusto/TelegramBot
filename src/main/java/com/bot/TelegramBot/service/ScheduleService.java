@@ -8,6 +8,7 @@ import com.bot.TelegramBot.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +21,7 @@ public class ScheduleService {
     private final ScheduleItemRepository scheduleRepo;
     private final StudentRepository studentRepo;
 
+    @Transactional
     public String getScheduleForToday(Long chatId){
 
         Optional<Student> optStudent = studentRepo.findByChatId(chatId);
@@ -46,16 +48,16 @@ public class ScheduleService {
             if (item.getSubject().isSelectiveSub() && !student.getSubjects().contains(item.getSubject())){
                     continue;
             }
-            sb.append(item.getLessonNumber()).append(". ").append(item.getSubject().getLessonName()).append(", ").append(item.getSubject().getZoomLink()).append("\n");
+            sb.append(item.getLessonNumber()).append(". ").append(item.getSubject().getLessonName()).append(", ").append(item.getSubject().getZoomLink()).append(", ").append("Аудиторія ").append(item.getAuditory()).append("\n");
         }
         return sb.toString();
     }
 
     public String addScheduleItem(ScheduleItem scheduleItem){
         scheduleRepo.save(scheduleItem);
-        String response = String.format("Добавлен элемент расписания:%nПредмет: %s%nДень тижня: %s%nНомер пари: %d",
+        String response = String.format("Добавлен элемент расписания:%nПредмет: %s%nДень тижня: %s%nНомер пари: %d%nАудиторія: %s",
                 scheduleItem.getSubject().getLessonName(), scheduleItem.getDayOfWeek(),
-                scheduleItem.getLessonNumber());
+                scheduleItem.getLessonNumber(), scheduleItem.getAuditory());
         return response;
     }
 }

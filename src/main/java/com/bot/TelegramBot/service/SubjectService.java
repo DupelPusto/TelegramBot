@@ -13,8 +13,8 @@ public class SubjectService {
 
     public String addSubject(Subject subject){
         subjectRepo.save(subject);
-        String responce = String.format("Предмет добавлен:%nНазва предмету: %s%nВикладач: %s%nПосилання: %s%nВибірковий: %b",
+        String response = String.format("Предмет добавлен:%nНазва предмету: %s%nВикладач: %s%nПосилання: %s%nВибірковий: %b",
                 subject.getLessonName(), subject.getTeacher(), subject.getZoomLink(), subject.isSelectiveSub());
-        return responce;
+        return response;
     }
 }

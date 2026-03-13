@@ -102,6 +102,8 @@ public class AdminHandler {
                 return createSchItemName(update);
             case WAITING_FOR_SCHITEM_LESSON_NUMBER:
                 return createSchItemNumber(update);
+            case WAITING_FOR_SCHITEM_LESSON_AUDITORY:
+                return createSchItemAuditory(tgId, text);
             case WAITING_FOR_SCHITEM_DAY:
                 return createSchItemDay(update);
         }
@@ -113,13 +115,13 @@ public class AdminHandler {
     private SendMessage showCommands(Long tgId){
 
         StringBuilder response = new StringBuilder("Привет, админ!\nДоступные команды:\n");
-        response.append(AdminCommands.SHOW_STUDENTS).append(" - Показать всех студентов");
-        response.append(AdminCommands.ADD_STUDENT).append(" - Добавить студента");
-        response.append(AdminCommands.DELETE_STUDENT).append(" - Удалить студента");
-        response.append(AdminCommands.SHOW_SUBJECTS).append(" - Показать список предметов");
-        response.append(AdminCommands.ADD_SUBJECT).append(" - Добавить предмет");
-        response.append(AdminCommands.DELETE_SUBJECT).append(" - Удалить предмет");
-        response.append(AdminCommands.ADD_SCHITEM).append(" - Добавить элемент расписания");
+        response.append(AdminCommands.SHOW_STUDENTS).append(" - Показать всех студентов\n");
+        response.append(AdminCommands.ADD_STUDENT).append(" - Добавить студента\n");
+        response.append(AdminCommands.DELETE_STUDENT).append(" - Удалить студента\n");
+        response.append(AdminCommands.SHOW_SUBJECTS).append(" - Показать список предметов\n");
+        response.append(AdminCommands.ADD_SUBJECT).append(" - Добавить предмет\n");
+        response.append(AdminCommands.DELETE_SUBJECT).append(" - Удалить предмет\n");
+        response.append(AdminCommands.ADD_SCHITEM).append(" - Добавить элемент расписания\n");
         return createMessage(tgId, response.toString());
 
     }
@@ -234,8 +236,18 @@ public class AdminHandler {
         }
 
         draftSchItems.get(tgId).setLessonNumber(lessonNumber);
-        adminStates.put(tgId, AdminState.WAITING_FOR_SCHITEM_DAY);
+        adminStates.put(tgId, AdminState.WAITING_FOR_SCHITEM_LESSON_AUDITORY);
 
+
+        String response = "Введи номер аудитории: ";
+
+        return createMessage(tgId, response);
+    }
+
+    private SendMessage createSchItemAuditory(Long tgId, String text){
+
+        draftSchItems.get(tgId).setAuditory(text);
+        adminStates.put(tgId, AdminState.WAITING_FOR_SCHITEM_DAY);
         String response = "Введи день недели:";
         return createMessage(tgId, response);
     }
@@ -290,7 +302,7 @@ public class AdminHandler {
         String text = update.getMessage().getText();
         draftSubjects.get(tgId).setTeacher(text);
         adminStates.put(tgId, AdminState.WAITING_FOR_LESSON_SELECTIVE);
-        String responce = "Это выборочный предмет?(+,-)";
+        String responce = "Это выборочный предмет?(+,-):";
         return createMessage(tgId, responce);
     }
 
