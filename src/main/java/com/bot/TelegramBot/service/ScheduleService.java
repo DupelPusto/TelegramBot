@@ -50,4 +50,12 @@ public class ScheduleService {
         }
         return sb.toString();
     }
+
+    public String addScheduleItem(ScheduleItem scheduleItem){
+        scheduleRepo.save(scheduleItem);
+        String response = String.format("Добавлен элемент расписания:%nПредмет: %s%nДень тижня: %s%nНомер пари: %d",
+                scheduleItem.getSubject().getLessonName(), scheduleItem.getDayOfWeek(),
+                scheduleItem.getLessonNumber());
+        return response;
+    }
 }

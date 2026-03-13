@@ -18,5 +18,12 @@ public class Subject {
 
     private String zoomLink;
 
+    private String teacher;
+
     private boolean isSelectiveSub;
+
+    @Override
+    public String toString() {
+        return lessonName;
+    }
 }

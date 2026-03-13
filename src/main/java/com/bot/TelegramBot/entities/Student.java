@@ -28,4 +28,22 @@ public class Student {
     @ManyToMany
     private Set<Subject> subjects;
 
+
+    public String toTelegramFormat(){
+        StringBuilder studentInfo = new StringBuilder("--------------------");
+        studentInfo.append("\nСтудент: ").append(getName()).append(" ").append(getSurname()).append("\n");
+        studentInfo.append("ID: ").append(getId()).append("\n");
+        studentInfo.append("Инвайт-код: ").append(getInviteCode()).append("\n");
+        studentInfo.append("Выборочные предметы: ");
+        for (Subject s : getSubjects()){
+            if (getSubjects() == null){
+                studentInfo.append("отсутствуют");
+            }
+            if (s != null) {
+                studentInfo.append(s.getLessonName()).append(" ");
+            }
+        }
+        studentInfo.append("\n--------------------");
+        return studentInfo.toString();
+    }
 }

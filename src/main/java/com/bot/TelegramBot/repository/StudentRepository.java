@@ -8,4 +8,7 @@ import java.util.Optional;
 public interface StudentRepository extends JpaRepository<Student, Long> {
 
     Optional<Student> findByChatId(Long chatId);
+
+    Optional<Student> findByInviteCode(String inviteCode);
+
 }
