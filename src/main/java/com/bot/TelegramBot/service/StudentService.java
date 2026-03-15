@@ -30,7 +30,7 @@ public class StudentService {
 
     @Transactional
     public StudentPageDto showStudent(int pageNumber){
-        int pageSize = 10;
+        int pageSize = 5;
 
 
         Sort sort = Sort.by(Direction.ASC, "surname");

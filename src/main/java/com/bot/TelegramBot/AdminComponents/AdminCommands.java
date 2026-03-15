@@ -1,13 +1,13 @@
 package com.bot.TelegramBot.AdminComponents;
 
 class AdminCommands {
-    static String ADD_STUDENT = "/add_student";
-    static String ADD_SUBJECT = "/add_subject";
-    static String DELETE_STUDENT = "/delete_student";
-    static String DELETE_SUBJECT = "/delete_subject";
-    static String SHOW_STUDENTS = "/show_students";
-    static String SHOW_SUBJECTS = "/show_subjects";
-    static String ADD_SCHITEM = "/add_schitem";
-    static String SHOW_COMMANDS = "/+++";
+    static String ADD_STUDENT = "/student_add";
+    static String ADD_SUBJECT = "/subject_add";
+    static String DELETE_STUDENT = "/student_delete";
+    static String DELETE_SUBJECT = "/subject_delete";
+    static String SHOW_STUDENTS = "/student_show";
+    static String SHOW_SUBJECTS = "/subject_show";
+    static String ADD_SCHITEM = "/schedule_add";
+    static String SHOW_COMMANDS = "/++";
 
 }

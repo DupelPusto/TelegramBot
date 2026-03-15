@@ -31,8 +31,11 @@ public class Bot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         try {
 
+            if (update.hasCallbackQuery()){
+                execute(adminHandler.adminHandler(update));
+            }
             if (update.hasMessage() && update.getMessage().hasText()) {
-                if (update.getMessage().getChatId().equals(adminId) || update.hasCallbackQuery()) {
+                if (update.getMessage().getChatId().equals(adminId)) {
                     execute(adminHandler.adminHandler(update));
                 } else {
                     execute(userHandler.userHandler(update));

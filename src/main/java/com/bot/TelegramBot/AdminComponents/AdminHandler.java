@@ -1,5 +1,6 @@
 package com.bot.TelegramBot.AdminComponents;
 
+import com.bot.TelegramBot.dto.HandlerResponseDto;
 import com.bot.TelegramBot.dto.StudentPageDto;
 import com.bot.TelegramBot.entities.ScheduleItem;
 import com.bot.TelegramBot.entities.Student;
@@ -26,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class AdminHandler {
 
+    private final List<Handleable> handlers;
+
     private final StudentService studentService;
     private final SubjectService subjectService;
     private final SubjectRepository subjectRepo;
@@ -35,6 +38,29 @@ public class AdminHandler {
     Map<Long, Subject> draftSubjects = new ConcurrentHashMap<>();
     Map<Long, ScheduleItem> draftSchItems = new ConcurrentHashMap<>();
 
+    public BotApiMethod<?> handle(Update update){
+        Long chatId = null;
+        String text = null;
+        String safeText;
+        Integer messageId;
+        HandlerResponseDto dto = null;
+
+        if (update.hasMessage() && update.getMessage().hasText()){
+            chatId = update.getMessage().getChatId();
+            text = update.getMessage().getText();
+            safeText = (text != null) ? text : "";
+            adminStates.getOrDefault(chatId, AdminState.FREE);
+
+            for (Handleable handler : handlers){
+                if (handler.canHandle(adminStates.get(chatId), safeText)){
+                    dto = handler.handle(chatId, safeText, adminStates.get(chatId));
+                    adminStates.put(chatId, dto.state());
+                    return dto.response();
+                }
+            }
+        }
+        return createMessage(chatId, "Неизвестная команда админа");
+    }
 
     public BotApiMethod<?> adminHandler(Update update){
         Long tgId = null;
@@ -44,6 +70,8 @@ public class AdminHandler {
         if (update.hasMessage() && update.getMessage().hasText()) {
             tgId = update.getMessage().getChatId();
             text = update.getMessage().getText();
+
+
         }
 
         else if (update.hasCallbackQuery()) {
@@ -67,14 +95,14 @@ public class AdminHandler {
         switch (currentState){
             case FREE:
                 if (text.equals(AdminCommands.ADD_STUDENT)){
-                    return createStudentStart(update);
+                    return createStudentStart(tgId);
                 }
                 if (text.equals(AdminCommands.ADD_SUBJECT)){
-                    return createSubjectStart(update);
+                    return createSubjectStart(tgId);
                 }
-                if (text.equals(AdminCommands.ADD_SCHITEM)){
-                    return createSchItemStart(tgId);
-                }
+//                if (text.equals(AdminCommands.ADD_SCHITEM)){
+//                    return createSchItemStart(tgId);
+//                }
                 if (text.equals(AdminCommands.SHOW_STUDENTS)){
                     return showStudents(tgId);
                 }
@@ -82,30 +110,30 @@ public class AdminHandler {
                     return showCommands(tgId);
                 }
                 break;
-            case WAITING_FOR_STUDENT_NAME:
-                return createStudentName(update);
-            case WAITING_FOR_STUDENT_SURNAME:
-                return createStudentSurname(update);
-            case WAITING_FOR_STUDENT_INVITE_CODE:
-                return createStudentInviteCode(update);
-            case WAITING_FOR_STUDENT_SUBJECTS:
-                return createStudentFinish(update);
-            case WAITING_FOR_LESSON_NAME:
-                return createSubjectName(update);
-            case WAITING_FOR_LESSON_LINK:
-                return createSubjectLink(update);
-            case WAITING_FOR_LESSON_TEACHER:
-                return createSubjectTeacher(update);
-            case WAITING_FOR_LESSON_SELECTIVE:
-                return createSubjectFinish(update);
-            case WAITING_FOR_SCHITEM_LESSON_NAME:
-                return createSchItemName(update);
-            case WAITING_FOR_SCHITEM_LESSON_NUMBER:
-                return createSchItemNumber(update);
-            case WAITING_FOR_SCHITEM_LESSON_AUDITORY:
-                return createSchItemAuditory(tgId, text);
-            case WAITING_FOR_SCHITEM_DAY:
-                return createSchItemDay(update);
+            case STUDENT_WAITING_FOR_NAME:
+                return createStudentName(tgId, text);
+            case STUDENT_WAITING_FOR_SURNAME:
+                return createStudentSurname(tgId,text);
+            case STUDENT_WAITING_FOR_INVITE_CODE:
+                return createStudentInviteCode(tgId, text);
+            case STUDENT_WAITING_FOR_SUBJECTS:
+                return createStudentFinish(tgId, text);
+            case LESSON_WAITING_FOR_NAME:
+                return createSubjectName(tgId, text);
+            case LESSON_WAITING_FOR_LINK:
+                return createSubjectLink(tgId, text);
+            case LESSON_WAITING_FOR_TEACHER:
+                return createSubjectTeacher(tgId, text);
+            case LESSON_WAITING_FOR_SELECTIVE:
+                return createSubjectFinish(tgId, text);
+//            case SCHITEM_WAITING_FOR_LESSON_NAME:
+//                return createSchItemName(tgId, text);
+//            case SCHITEM_WAITING_FOR_LESSON_NUMBER:
+//                return createSchItemNumber(tgId, text);
+//            case SCHITEM_WAITING_FOR_LESSON_AUDITORY:
+//                return createSchItemAuditory(tgId, text);
+//            case SCHITEM_WAITING_FOR_DAY:
+//                return createSchItemDay(tgId, text);
         }
 
         String responce = "Неизвестная команда админа";
@@ -197,119 +225,105 @@ public class AdminHandler {
         return editMessageText;
     }
 
-    private SendMessage createSchItemStart(Long tgId){
+//    private SendMessage createSchItemStart(Long tgId){
+//
+//        ScheduleItem scheduleItem = new ScheduleItem();
+//        draftSchItems.put(tgId, scheduleItem);
+//        adminStates.put(tgId,AdminState.SCHITEM_WAITING_FOR_LESSON_NAME);
+//        String response = "Введи название предмета: ";
+//        return createMessage(tgId, response);
+//    }
+//
+//    private SendMessage createSchItemName(Long tgId, String text){
+//
+//        Optional<Subject> optionalSubject = subjectRepo.findByLessonName(text);
+//
+//        if (optionalSubject.isPresent()){
+//            Subject subject = optionalSubject.get();
+//            draftSchItems.get(tgId).setSubject(subject);
+//        } else {
+//            return createMessage(tgId, "Предмет не найден, попробуй еще раз:");
+//        }
+//        adminStates.put(tgId, AdminState.SCHITEM_WAITING_FOR_LESSON_NUMBER);
+//        String response = "Введи номер пары: ";
+//        return createMessage(tgId, response);
+//    }
+//
+//    private SendMessage createSchItemNumber(Long tgId, String text){
+//
+//        Integer lessonNumber;
+//        try {
+//            lessonNumber = Integer.parseInt(text);
+//        } catch (NumberFormatException e) {
+//            String response = "Неверный формат номера, попробуй снова:";
+//            return createMessage(tgId, response);
+//        }
+//
+//        draftSchItems.get(tgId).setLessonNumber(lessonNumber);
+//        adminStates.put(tgId, AdminState.SCHITEM_WAITING_FOR_LESSON_AUDITORY);
+//
+//
+//        String response = "Введи номер аудитории: ";
+//
+//        return createMessage(tgId, response);
+//    }
+//
+//    private SendMessage createSchItemAuditory(Long tgId, String text){
+//
+//        draftSchItems.get(tgId).setAuditory(text);
+//        adminStates.put(tgId, AdminState.SCHITEM_WAITING_FOR_DAY);
+//        String response = "Введи день недели:";
+//        return createMessage(tgId, response);
+//    }
+//
+//    private SendMessage createSchItemDay(Long tgId, String text){
+//
+//        DayOfWeek day = DateUtil.parseDayOfWeek(text);
+//        if (day == null) {
+//            return createMessage(tgId, "Неверный формат дня. Попробуй снова в формате 'Пн' или 'пн':");
+//        }
+//        draftSchItems.get(tgId).setDayOfWeek(day);
+//        String response = scheduleService.addScheduleItem(draftSchItems.get(tgId));
+//        adminStates.put(tgId, AdminState.FREE);
+//        draftSchItems.remove(tgId);
+//        return createMessage(tgId, response);
+//    }
 
-        ScheduleItem scheduleItem = new ScheduleItem();
-        draftSchItems.put(tgId, scheduleItem);
-        adminStates.put(tgId,AdminState.WAITING_FOR_SCHITEM_LESSON_NAME);
-        String response = "Введи название предмета: ";
-        return createMessage(tgId, response);
-    }
+    private SendMessage createSubjectStart(Long tgId){
 
-    private SendMessage createSchItemName(Update update){
-
-        Long tgId = update.getMessage().getChatId();
-        String text = update.getMessage().getText();
-        Optional<Subject> optionalSubject = subjectRepo.findByLessonName(text);
-
-        if (optionalSubject.isPresent()){
-            Subject subject = optionalSubject.get();
-            draftSchItems.get(tgId).setSubject(subject);
-        } else {
-            return createMessage(tgId, "Предмет не найден, попробуй еще раз:");
-        }
-        adminStates.put(tgId, AdminState.WAITING_FOR_SCHITEM_LESSON_NUMBER);
-        String response = "Введи номер пары: ";
-        return createMessage(tgId, response);
-    }
-
-    private SendMessage createSchItemNumber(Update update){
-
-        Long tgId = update.getMessage().getChatId();
-        String text = update.getMessage().getText();
-        Integer lessonNumber;
-        try {
-            lessonNumber = Integer.parseInt(text);
-        } catch (NumberFormatException e) {
-            String response = "Неверный формат номера, попробуй снова:";
-            return createMessage(tgId, response);
-        }
-
-        draftSchItems.get(tgId).setLessonNumber(lessonNumber);
-        adminStates.put(tgId, AdminState.WAITING_FOR_SCHITEM_LESSON_AUDITORY);
-
-
-        String response = "Введи номер аудитории: ";
-
-        return createMessage(tgId, response);
-    }
-
-    private SendMessage createSchItemAuditory(Long tgId, String text){
-
-        draftSchItems.get(tgId).setAuditory(text);
-        adminStates.put(tgId, AdminState.WAITING_FOR_SCHITEM_DAY);
-        String response = "Введи день недели:";
-        return createMessage(tgId, response);
-    }
-
-    private SendMessage createSchItemDay(Update update){
-
-        Long tgId = update.getMessage().getChatId();
-        String text = update.getMessage().getText();
-        DayOfWeek day = DateUtil.parseDayOfWeek(text);
-        if (day == null) {
-            return createMessage(tgId, "Неверный формат дня. Попробуй снова в формате 'Пн' или 'пн':");
-        }
-        draftSchItems.get(tgId).setDayOfWeek(day);
-        String response = scheduleService.addScheduleItem(draftSchItems.get(tgId));
-        adminStates.put(tgId, AdminState.FREE);
-        draftSchItems.remove(tgId);
-        return createMessage(tgId, response);
-    }
-
-    private SendMessage createSubjectStart(Update update){
-
-        Long tgId = update.getMessage().getChatId();
         Subject subject = new Subject();
         draftSubjects.put(tgId, subject);
-        adminStates.put(tgId, AdminState.WAITING_FOR_LESSON_NAME);
+        adminStates.put(tgId, AdminState.LESSON_WAITING_FOR_NAME);
         String responce = "Введи название предмета:";
         return createMessage(tgId, responce);
     }
 
-    private SendMessage createSubjectName(Update update){
+    private SendMessage createSubjectName(Long tgId, String text){
 
-        Long tgId = update.getMessage().getChatId();
-        String text = update.getMessage().getText();
         draftSubjects.get(tgId).setLessonName(text);
-        adminStates.put(tgId, AdminState.WAITING_FOR_LESSON_LINK);
+        adminStates.put(tgId, AdminState.LESSON_WAITING_FOR_LINK);
         String responce = "Введи ссылку на предмет:";
         return createMessage(tgId,responce);
     }
 
-    private SendMessage createSubjectLink(Update update){
+    private SendMessage createSubjectLink(Long tgId, String text){
 
-        Long tgId = update.getMessage().getChatId();
-        String text = update.getMessage().getText();
         draftSubjects.get(tgId).setZoomLink(text);
-        adminStates.put(tgId, AdminState.WAITING_FOR_LESSON_TEACHER);
+        adminStates.put(tgId, AdminState.LESSON_WAITING_FOR_TEACHER);
         String responce = "Введи имя преподователя:";
         return createMessage(tgId, responce);
     }
 
-    private SendMessage createSubjectTeacher(Update update){
-        Long tgId = update.getMessage().getChatId();
-        String text = update.getMessage().getText();
+    private SendMessage createSubjectTeacher(Long tgId, String text){
+
         draftSubjects.get(tgId).setTeacher(text);
-        adminStates.put(tgId, AdminState.WAITING_FOR_LESSON_SELECTIVE);
+        adminStates.put(tgId, AdminState.LESSON_WAITING_FOR_SELECTIVE);
         String responce = "Это выборочный предмет?(+,-):";
         return createMessage(tgId, responce);
     }
 
-    private SendMessage createSubjectFinish(Update update){
+    private SendMessage createSubjectFinish(Long tgId, String text){
 
-        Long tgId = update.getMessage().getChatId();
-        String text = update.getMessage().getText();
         if (text.equals("+")){
             draftSubjects.get(tgId).setSelectiveSub(true);
         } else if (text.equals("-")){
@@ -323,63 +337,66 @@ public class AdminHandler {
         return createMessage(tgId, responce);
     }
 
-    private SendMessage createStudentStart(Update update){
+    private SendMessage createStudentStart(Long tgId){
 
-        Long tgId = update.getMessage().getChatId();
         Student student = new Student();
         draftStudents.put(tgId, student);
-        adminStates.put(tgId, AdminState.WAITING_FOR_STUDENT_NAME);
+        adminStates.put(tgId, AdminState.STUDENT_WAITING_FOR_NAME);
         String response = "Введи Имя студента";
         return createMessage(tgId, response);
     }
 
-    private SendMessage createStudentName(Update update){
+    private SendMessage createStudentName(Long tgId, String text){
 
-        Long tgId = update.getMessage().getChatId();
-        String studentName = update.getMessage().getText();
-        draftStudents.get(tgId).setName(studentName);
-        adminStates.put(tgId, AdminState.WAITING_FOR_STUDENT_SURNAME);
+        draftStudents.get(tgId).setName(text);
+        adminStates.put(tgId, AdminState.STUDENT_WAITING_FOR_SURNAME);
         String response = "Введи Фамилию студента";
         return createMessage(tgId, response);
     }
 
-    private SendMessage createStudentSurname(Update update){
+    private SendMessage createStudentSurname(Long tgId, String text){
 
-        Long tgId = update.getMessage().getChatId();
-        String studentSurname = update.getMessage().getText();
-        draftStudents.get(tgId).setSurname(studentSurname);
-        adminStates.put(tgId, AdminState.WAITING_FOR_STUDENT_INVITE_CODE);
+        draftStudents.get(tgId).setSurname(text);
+        adminStates.put(tgId, AdminState.STUDENT_WAITING_FOR_INVITE_CODE);
         String responce = String.format("Введи инвайт-код для %s %s:", draftStudents.get(tgId).getName(), draftStudents.get(tgId).getSurname());
         return createMessage(tgId, responce);
     }
 
-    private SendMessage createStudentInviteCode(Update update){
+    private SendMessage createStudentInviteCode(Long tgId, String text){
 
-        Long tgId = update.getMessage().getChatId();
-        String studentInviteCode = update.getMessage().getText();
-        draftStudents.get(tgId).setInviteCode(studentInviteCode);
-        adminStates.put(tgId, AdminState.WAITING_FOR_STUDENT_SUBJECTS);
+        draftStudents.get(tgId).setInviteCode(text);
+        adminStates.put(tgId, AdminState.STUDENT_WAITING_FOR_SUBJECTS);
         String responce = String.format("Введи выборочные предметы для %s %s:", draftStudents.get(tgId).getName(), draftStudents.get(tgId).getSurname());
         return createMessage(tgId, responce);
     }
 
-    private SendMessage createStudentFinish(Update update){
-        Long tgId = update.getMessage().getChatId();
-        String studentSubjects = update.getMessage().getText();
-        String[] subjects = studentSubjects.split(",");
+    private SendMessage createStudentFinish(Long tgId, String text){
+
+        String[] subjects = text.split(",");
         Set<Subject> drafrStSubjects = new HashSet<>();
+        List<String> notFoundSubjects = new ArrayList<>();
         for (String lesson : subjects){
             Optional<Subject> sub = subjectRepo.findByLessonName(lesson.trim());
             if (sub.isPresent()){
                 drafrStSubjects.add(sub.get());
+            }else {
+                notFoundSubjects.add(lesson.trim());
             }
-        }
-        draftStudents.get(tgId).setSubjects(drafrStSubjects);
-        adminStates.put(tgId, AdminState.FREE);
-        String responce = studentService.addStudent(draftStudents.get(tgId));
-        draftStudents.remove(tgId);
 
-        return createMessage(tgId, responce);
+
+        }
+        String response = null;
+        if (notFoundSubjects.isEmpty()){
+            draftStudents.get(tgId).setSubjects(drafrStSubjects);
+            adminStates.put(tgId, AdminState.FREE);
+            response = studentService.addStudent(draftStudents.get(tgId));
+            draftStudents.remove(tgId);
+        } else {
+            response = String.format("Не найдены следующие предметы: %s. Попробуй ввести снова:", notFoundSubjects);
+        }
+
+
+        return createMessage(tgId, response);
     }
 
     private SendMessage createMessage(Long id, String text){
