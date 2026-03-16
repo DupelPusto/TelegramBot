@@ -1,6 +1,6 @@
 package com.bot.TelegramBot.service;
 
-import com.bot.TelegramBot.dto.StudentPageDto;
+import com.bot.TelegramBot.dto.PageDto;
 import com.bot.TelegramBot.entities.Student;
 import com.bot.TelegramBot.entities.Subject;
 import com.bot.TelegramBot.repository.StudentRepository;
@@ -29,7 +29,7 @@ public class StudentService {
 
 
     @Transactional
-    public StudentPageDto showStudent(int pageNumber){
+    public PageDto showStudent(int pageNumber){
         int pageSize = 5;
 
 
@@ -43,14 +43,14 @@ public class StudentService {
                 .collect(Collectors.joining("\n"));
 
         if (students.isEmpty()) {
-            return new StudentPageDto("На этой странице пока нет студентов",
+            return new PageDto("На этой странице пока нет студентов",
                     1,
                     0);
         }
 
 
 
-        return new StudentPageDto(
+        return new PageDto(
                 "📋 Список студентов:\n" + students,
                 studentPage.getTotalPages(),
                 pageNumber);

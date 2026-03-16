@@ -2,11 +2,9 @@ package com.bot.TelegramBot;
 
 import com.bot.TelegramBot.AdminComponents.AdminHandler;
 import com.bot.TelegramBot.UserComponents.UserHandler;
-import com.bot.TelegramBot.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -32,11 +30,11 @@ public class Bot extends TelegramLongPollingBot {
         try {
 
             if (update.hasCallbackQuery()){
-                execute(adminHandler.adminHandler(update));
+                execute(adminHandler.handle(update));
             }
             if (update.hasMessage() && update.getMessage().hasText()) {
                 if (update.getMessage().getChatId().equals(adminId)) {
-                    execute(adminHandler.adminHandler(update));
+                    execute(adminHandler.handle(update));
                 } else {
                     execute(userHandler.userHandler(update));
                 }

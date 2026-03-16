@@ -31,12 +31,14 @@ public class ScheduleHandler implements Handleable{
     }
 
     @Override
-    public HandlerResponseDto handle(Long chatId, String text, AdminState state) {
+    public HandlerResponseDto handle(Long chatId, String text, AdminState state, Integer messageId) {
 
-        switch (state){
-
+        switch (state) {
             case FREE:
-                return createSchItemStart(chatId);
+                if (text.equals(AdminCommands.ADD_SCHITEM)){
+                    return createSchItemStart(chatId);
+                }
+                break;
             case SCHITEM_WAITING_FOR_LESSON_NAME:
                 return createSchItemName(chatId, text);
             case SCHITEM_WAITING_FOR_LESSON_NUMBER:
@@ -45,10 +47,8 @@ public class ScheduleHandler implements Handleable{
                 return createSchItemAuditory(chatId, text);
             case SCHITEM_WAITING_FOR_DAY:
                 return createSchItemDay(chatId, text);
-
         }
-
-        return new HandlerResponseDto(createMessage(chatId, "Неизвестная ошибка"), state);
+        return new HandlerResponseDto(createMessage(chatId, "Неизвестная ошибка, попробуй снова"), state);
     }
 
 
