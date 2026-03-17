@@ -39,11 +39,20 @@ public class UserHandler {
                 return createMessage(chatId, scheduleService.getScheduleForToday(chatId));
             case LOGIN:
                 return registerStudent(update);
+            case LINK:
+                return getLessonLink(chatId);
 
         }
 
+        if (chatId == null) return null;
+
         String response = "Неизвестная команда";
         return createMessage(chatId, response);
+    }
+
+    private SendMessage getLessonLink(Long chatId){
+        String link = scheduleService.getLink(chatId);
+        return createMessage(chatId, link);
     }
 
     private SendMessage registerStudent(Update update){
@@ -63,11 +72,11 @@ public class UserHandler {
     }
 
     private String startMessage(String firstName){
-        return String.format("Привет, %s! Выбери что хочешь сделать:%n/link - ссылка на текущую пару%n/schedule - посмотреть расписание на сегодня%nНапиши /help на случай если забудешь команды",firstName);
+        return String.format("Привет, %s!%nЧтобы начать пользоваться ботом введи свой инвайт-код /login",firstName);
     }
 
     private String getHelp(){
-        return String.format("Выбери действие:%n/link - ссылка на текущую пару%n/schedule - расписание на сегодня");
+        return String.format("/link - ссылка на текущую пару%n/schedule - расписание на сегодня");
     }
 
     private SendMessage createMessage(Long id, String text){

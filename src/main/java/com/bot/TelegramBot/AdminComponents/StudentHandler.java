@@ -67,6 +67,7 @@ public class StudentHandler implements Handleable{
         PageDto dto = studentService.showStudent(initPage);
 
         SendMessage sm = new SendMessage();
+        sm.setParseMode("HTML");
         sm.setChatId(chatId);
         sm.setText(dto.text());
         InlineKeyboardMarkup keyboard = createInlineMarkupKeyboard(dto);
@@ -78,6 +79,7 @@ public class StudentHandler implements Handleable{
         PageDto dto = studentService.showStudent(page);
 
         EditMessageText editMessageText = new EditMessageText();
+        editMessageText.setParseMode("HTML");
         editMessageText.setMessageId(messageId);
         editMessageText.setChatId(tgId);
         editMessageText.setText(dto.text());

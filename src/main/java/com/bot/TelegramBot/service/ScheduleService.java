@@ -1,5 +1,7 @@
 package com.bot.TelegramBot.service;
 
+import com.bot.TelegramBot.dto.LessonTimeDto;
+import com.bot.TelegramBot.entities.LessonTime;
 import com.bot.TelegramBot.entities.ScheduleItem;
 import com.bot.TelegramBot.entities.Student;
 import com.bot.TelegramBot.entities.Subject;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +54,52 @@ public class ScheduleService {
             sb.append(item.getLessonNumber()).append(". ").append(item.getSubject().getLessonName()).append(", ").append(item.getSubject().getZoomLink()).append(", ").append("Аудиторія ").append(item.getAuditory()).append("\n");
         }
         return sb.toString();
+    }
+
+
+    public String getLink(Long chatId){
+
+        Optional<Student> optStudent = studentRepo.findByChatId(chatId);
+
+        if(optStudent.isEmpty()){
+            return "Упс...Я тебя пока не знаю. Введи свой инвайт код";
+        }
+
+        DayOfWeek today = LocalDate.now().getDayOfWeek();
+
+        if (today == DayOfWeek.SUNDAY || today == DayOfWeek.SATURDAY){
+            return "Сегодня выходной, отдыхай";
+        }
+
+        List<ScheduleItem> lessons = scheduleRepo.findAllByDayOfWeek(today);
+        if (lessons.isEmpty()){
+            return "На сегодня пар не найдено";
+        }
+
+
+        LessonTimeDto dto = LessonTime.getNumOfLesson();
+        Student student = optStudent.get();
+
+
+
+        if (dto.pairNumber() == null) return dto.message();
+
+        Optional<ScheduleItem> optional = scheduleRepo.findByDayOfWeekAndLessonNumber(today, dto.pairNumber());
+        if (optional.isEmpty()){
+            return "Сейчас окно, отдыхай. Но не забудь за следующую пару!";
+        }
+        ScheduleItem currentLesson = optional.get();
+
+        if (!student.getSubjects().contains(currentLesson.getSubject()) && currentLesson.getSubject().isSelectiveSub()) return "У тебя сейчас окно, отдыхай. Но не забудь про следующую пару!";
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(dto.message());
+
+        stringBuilder.append(currentLesson.getSubject().getLessonName()).append("\n");
+        stringBuilder.append("Викладач: ").append(currentLesson.getSubject().getTeacher()).append("\n");
+        stringBuilder.append("Посилання: ").append(currentLesson.getSubject().getZoomLink()).append("\n");
+
+        return stringBuilder.toString();
     }
 
     public String addScheduleItem(ScheduleItem scheduleItem){

@@ -1,13 +1,19 @@
 package com.bot.TelegramBot.AdminComponents;
 
 import com.bot.TelegramBot.dto.HandlerResponseDto;
+import com.bot.TelegramBot.dto.PageDto;
 import com.bot.TelegramBot.entities.Subject;
 import com.bot.TelegramBot.service.SubjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -28,12 +34,19 @@ public class SubjectHandler implements Handleable{
     @Override
     public HandlerResponseDto handle(Long chatId, String text, AdminState state, Integer messageId) {
 
+        if (text.startsWith("SUBJECT_PAGE_")){
+            int page = Integer.parseInt(text.replace("SUBJECT_PAGE_", ""));
+            return editSubjectMessage(chatId, messageId, page);
+        }
 
         switch (state){
 
             case FREE:
                 if (text.equals(AdminCommands.ADD_SUBJECT)){
                     return createSubjectStart(chatId);
+                }
+                if (text.equals(AdminCommands.SHOW_SUBJECTS)){
+                    return showSubject(chatId);
                 }
                 break;
             case LESSON_WAITING_FOR_NAME:
@@ -48,6 +61,34 @@ public class SubjectHandler implements Handleable{
         }
 
         return new HandlerResponseDto(createMessage(chatId,"Неизвестная команда, попробуй еще раз"), state);
+    }
+
+    private HandlerResponseDto showSubject(Long chatId){
+
+        int initPage = 0;
+        PageDto dto = subjectService.showSubject(initPage);
+
+        SendMessage sm = new SendMessage();
+        sm.setParseMode("HTML");
+        sm.setChatId(chatId);
+        sm.setText(dto.text());
+        InlineKeyboardMarkup keyboard = createInlineMarkupKeyboard(dto);
+        if (keyboard != null) sm.setReplyMarkup(keyboard);
+        return new HandlerResponseDto(sm, AdminState.FREE);
+    }
+
+    private HandlerResponseDto editSubjectMessage(Long tgId, Integer messageId, int page){
+        PageDto dto = subjectService.showSubject(page);
+
+        EditMessageText editMessageText = new EditMessageText();
+        editMessageText.setParseMode("HTML");
+        editMessageText.setMessageId(messageId);
+        editMessageText.setChatId(tgId);
+        editMessageText.setText(dto.text());
+
+        InlineKeyboardMarkup keyboard = createInlineMarkupKeyboard(dto);
+        if (keyboard != null) editMessageText.setReplyMarkup(keyboard);
+        return new HandlerResponseDto(editMessageText, AdminState.FREE);
     }
 
     private HandlerResponseDto createSubjectStart(Long chatId){
@@ -100,5 +141,33 @@ public class SubjectHandler implements Handleable{
         sm.setChatId(id);
         sm.setText(text);
         return sm;
+    }
+
+    private InlineKeyboardMarkup createInlineMarkupKeyboard(PageDto dto){
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine = new ArrayList<>();
+
+        if (dto.currentPage() > 0){
+            InlineKeyboardButton backButton = new InlineKeyboardButton();
+            backButton.setText("<--");
+            backButton.setCallbackData("SUBJECT_PAGE_" + (dto.currentPage() - 1));
+            rowInLine.add(backButton);
+        }
+
+        if (dto.currentPage() < dto.totalPages() - 1){
+            InlineKeyboardButton nextButton = new InlineKeyboardButton();
+            nextButton.setText("-->");
+            nextButton.setCallbackData("SUBJECT_PAGE_" + (dto.currentPage() + 1));
+            rowInLine.add(nextButton);
+        }
+
+        if (!rowInLine.isEmpty()){
+            rowsInLine.add(rowInLine);
+            inlineKeyboardMarkup.setKeyboard(rowsInLine);
+            return inlineKeyboardMarkup;
+        }
+
+        return null;
     }
 }

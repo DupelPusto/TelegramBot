@@ -26,4 +26,17 @@ public class Subject {
     public String toString() {
         return lessonName;
     }
+
+
+    public String toTelegramFormat(){
+        StringBuilder subjectInfo = new StringBuilder("------------------------------");
+        subjectInfo.append("\nПредмет: ").append(getLessonName()).append("\n");
+        subjectInfo.append("ID: <code>").append(getId()).append("</code>\n");
+        subjectInfo.append("Преподователь: ").append(getTeacher()).append("\n");
+        String isSelective = isSelectiveSub() ? "Да" : "Нет";
+        subjectInfo.append("Выборочный предмет: ").append(isSelective).append("\n");
+        subjectInfo.append("Ссылка на пару: ").append(getZoomLink());
+        subjectInfo.append("\n------------------------------");
+        return subjectInfo.toString();
+    }
 }
