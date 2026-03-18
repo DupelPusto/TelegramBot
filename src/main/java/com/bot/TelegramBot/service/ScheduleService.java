@@ -56,7 +56,7 @@ public class ScheduleService {
         return sb.toString();
     }
 
-
+    @Transactional
     public String getLink(Long chatId){
 
         Optional<Student> optStudent = studentRepo.findByChatId(chatId);
@@ -90,7 +90,16 @@ public class ScheduleService {
         }
         ScheduleItem currentLesson = optional.get();
 
-        if (!student.getSubjects().contains(currentLesson.getSubject()) && currentLesson.getSubject().isSelectiveSub()) return "У тебя сейчас окно, отдыхай. Но не забудь про следующую пару!";
+        boolean hasSubject = false;
+        if (student.getSubjects() != null) {
+            hasSubject = student.getSubjects().stream()
+                    .anyMatch(s -> s.getId().equals(currentLesson.getSubject().getId()));
+        }
+
+
+        if (currentLesson.getSubject().isSelectiveSub() && !hasSubject) {
+            return "У тебя сейчас окно, отдыхай. Но не забудь про следующую пару!";
+        }
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(dto.message());
