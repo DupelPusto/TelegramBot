@@ -2,6 +2,7 @@ package com.bot.TelegramBot.AdminComponents;
 
 import com.bot.TelegramBot.dto.HandlerResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -80,6 +81,7 @@ public class AdminHandler {
         response.append(AdminCommands.SHOW_SUBJECTS).append(" - Показать список предметов\n");
         response.append(AdminCommands.ADD_SUBJECT).append(" - Добавить предмет\n");
         response.append(AdminCommands.DELETE_SUBJECT).append(" - Удалить предмет\n");
+        response.append(AdminCommands.EDIT_SUBJECT).append(" - Редактировать предмет\n");
         response.append(AdminCommands.ADD_SCHITEM).append(" - Добавить элемент расписания\n");
         return createMessage(tgId, response.toString());
 
