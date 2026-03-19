@@ -81,6 +81,7 @@ public class UserHandler {
 
     private SendMessage createMessage(Long id, String text){
         SendMessage sm = new SendMessage();
+        sm.setParseMode("HTML");
         sm.setChatId(id);
         sm.setText(text);
         return sm;

@@ -51,7 +51,11 @@ public class ScheduleService {
             if (item.getSubject().isSelectiveSub() && !student.getSubjects().contains(item.getSubject())){
                     continue;
             }
-            sb.append(item.getLessonNumber()).append(". ").append(item.getSubject().getLessonName()).append(", ").append(item.getSubject().getZoomLink()).append(", ").append("Аудиторія ").append(item.getAuditory()).append("\n");
+
+            sb.append("\n<b>").append(item.getLessonNumber()).append(". ").append(item.getSubject().getLessonName()).append("</b>\n");
+            sb.append("<a href='").append(item.getSubject().getZoomLink()).append("'>ПОСИЛАННЯ НА ПАРУ</a>\n");
+            sb.append("<b>Аудиторія ").append(item.getAuditory()).append("</b>");
+
         }
         return sb.toString();
     }
@@ -106,7 +110,7 @@ public class ScheduleService {
 
         stringBuilder.append(currentLesson.getSubject().getLessonName()).append("\n");
         stringBuilder.append("Викладач: ").append(currentLesson.getSubject().getTeacher()).append("\n");
-        stringBuilder.append("Посилання: ").append(currentLesson.getSubject().getZoomLink()).append("\n");
+        stringBuilder.append("Посилання на пару: <a href='").append(currentLesson.getSubject().getZoomLink()).append("'>НАТИСНИ</a>\n");
 
         return stringBuilder.toString();
     }
