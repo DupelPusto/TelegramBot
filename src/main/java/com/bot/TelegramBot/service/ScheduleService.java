@@ -54,7 +54,7 @@ public class ScheduleService {
 
             sb.append("\n<b>").append(item.getLessonNumber()).append(". ").append(item.getSubject().getLessonName()).append("</b>\n");
             sb.append("<a href='").append(item.getSubject().getZoomLink()).append("'>ПОСИЛАННЯ НА ПАРУ</a>\n");
-            sb.append("<b>Аудиторія ").append(item.getAuditory()).append("</b>");
+            sb.append("<b>Аудиторія ").append(item.getAuditory()).append("</b>\n");
 
         }
         return sb.toString();
