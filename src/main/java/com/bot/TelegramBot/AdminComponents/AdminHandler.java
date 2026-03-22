@@ -19,7 +19,7 @@ public class AdminHandler {
 
     Map<Long, AdminState> adminStates = new ConcurrentHashMap<>();
 
-    public BotApiMethod<?> handle(Update update){
+    public HandlerResponseDto handle(Update update){
         Long chatId = null;
         String text;
         String safeText;
@@ -43,13 +43,13 @@ public class AdminHandler {
             AdminState currentState = adminStates.getOrDefault(chatId, AdminState.FREE);
 
             if (safeText.equals(AdminCommands.SHOW_COMMANDS)){
-                return showCommands(chatId);
+                return new HandlerResponseDto(showCommands(chatId), AdminState.FREE);
             }
             for (Handleable handler : handlers){
                 if (handler.canHandle(currentState, safeText)){
                     dto = handler.handle(chatId, safeText, currentState, null);
                     adminStates.put(chatId, dto.state());
-                    return dto.response();
+                    return dto;
                 }
             }
         }
@@ -64,11 +64,11 @@ public class AdminHandler {
                 if (handler.canHandle(currentState, text)){
                     dto = handler.handle(chatId, text, currentState, messageId);
                     adminStates.put(chatId, dto.state());
-                    return dto.response();
+                    return dto;
                 }
             }
         }
-        return createMessage(chatId, "Неизвестная команда админа");
+        return new HandlerResponseDto(createMessage(chatId, "Неизвестная команда админа"),AdminState.FREE);
     }
 
 
@@ -77,12 +77,13 @@ public class AdminHandler {
         StringBuilder response = new StringBuilder("Привет, админ!\nДоступные команды:\n");
         response.append(AdminCommands.SHOW_STUDENTS).append(" - Показать всех студентов\n");
         response.append(AdminCommands.ADD_STUDENT).append(" - Добавить студента\n");
-        response.append(AdminCommands.DELETE_STUDENT).append(" - Удалить студента\n");
+//        response.append(AdminCommands.DELETE_STUDENT).append(" - Удалить студента\n");
         response.append(AdminCommands.SHOW_SUBJECTS).append(" - Показать список предметов\n");
         response.append(AdminCommands.ADD_SUBJECT).append(" - Добавить предмет\n");
-        response.append(AdminCommands.DELETE_SUBJECT).append(" - Удалить предмет\n");
+//        response.append(AdminCommands.DELETE_SUBJECT).append(" - Удалить предмет\n");
         response.append(AdminCommands.EDIT_SUBJECT).append(" - Редактировать предмет\n");
         response.append(AdminCommands.ADD_SCHITEM).append(" - Добавить элемент расписания\n");
+        response.append(AdminCommands.BROADCAST).append(" - Разослать сообщение\n");
         return createMessage(tgId, response.toString());
 
     }

@@ -2,9 +2,11 @@ package com.bot.TelegramBot;
 
 import com.bot.TelegramBot.AdminComponents.AdminHandler;
 import com.bot.TelegramBot.UserComponents.UserHandler;
+import com.bot.TelegramBot.dto.HandlerResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -30,11 +32,13 @@ public class Bot extends TelegramLongPollingBot {
         try {
 
             if (update.hasCallbackQuery()){
-                execute(adminHandler.handle(update));
+                executeAdminDto(adminHandler.handle(update));
             }
             if (update.hasMessage() && update.getMessage().hasText()) {
                 if (update.getMessage().getChatId().equals(adminId)) {
-                    execute(adminHandler.handle(update));
+
+
+                    executeAdminDto(adminHandler.handle(update));
                 } else {
                     execute(userHandler.userHandler(update));
                 }
@@ -48,6 +52,25 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public String getBotUsername() {
         return botName;
+    }
+
+    private void executeAdminDto(HandlerResponseDto dto) throws TelegramApiException {
+        if (dto == null) return;
+
+        if (dto.messages() != null && !dto.messages().isEmpty()) {
+            for (SendMessage msg : dto.messages()) {
+                execute(msg);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        else if (dto.response() != null) {
+            execute(dto.response());
+        }
     }
 
 }

@@ -10,5 +10,6 @@ class AdminCommands {
     static String EDIT_SUBJECT = "/edit_subject";
     static String ADD_SCHITEM = "/schedule_add";
     static String SHOW_COMMANDS = "/++";
+    static String BROADCAST = "/broadcast_message";
 
 }
