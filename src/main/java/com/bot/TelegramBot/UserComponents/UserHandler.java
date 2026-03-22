@@ -33,12 +33,14 @@ public class UserHandler {
 
             case START:
                 return createMessage(chatId, startMessage(update.getMessage().getChat().getFirstName()));
+            case LOGIN:
+                return registerStudent(update);
             case HELP:
                 return createMessage(chatId, getHelp());
             case SCHEDULE:
                 return createMessage(chatId, scheduleService.getScheduleForToday(chatId));
-            case LOGIN:
-                return registerStudent(update);
+            case SCHEDULE_FOR_WEEK:
+                return createMessage(chatId, scheduleService.getScheduleForWeek(chatId));
             case LINK:
                 return getLessonLink(chatId);
 
@@ -54,6 +56,7 @@ public class UserHandler {
         String link = scheduleService.getLink(chatId);
         return createMessage(chatId, link);
     }
+
 
     private SendMessage registerStudent(Update update){
         Long chatId = update.getMessage().getChatId();
@@ -76,7 +79,7 @@ public class UserHandler {
     }
 
     private String getHelp(){
-        return String.format("/link - ссылка на текущую пару%n/schedule - расписание на сегодня");
+        return String.format("/link - Ссылка на текущую пару%n/schedule - Расписание на сегодня%n/schedule_week - Расписание на неделю");
     }
 
     private SendMessage createMessage(Long id, String text){

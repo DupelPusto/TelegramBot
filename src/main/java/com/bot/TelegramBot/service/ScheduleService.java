@@ -25,6 +25,48 @@ public class ScheduleService {
     private final StudentRepository studentRepo;
 
     @Transactional
+    public String getScheduleForWeek(Long chatId) {
+        Optional<Student> optStudent = studentRepo.findByChatId(chatId);
+
+        if (optStudent.isEmpty()) {
+            return "Упс...Я тебя пока не знаю. Введи свой инвайт код";
+        }
+
+        Student student = optStudent.get();
+        StringBuilder weekSchedule = new StringBuilder();
+        weekSchedule.append("Розклад на тиждень для ").append(student.getName()).append(" ").append(student.getSurname()).append(":\n\n");
+
+        for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
+
+            if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) continue;
+
+            List<ScheduleItem> lessons = scheduleRepo.findAllByDayOfWeek(dayOfWeek);
+
+            if (lessons.isEmpty()) continue;
+
+            String dayName = switch (dayOfWeek) {
+                case MONDAY -> "ПОНЕДІЛОК";
+                case TUESDAY -> "ВІВТОРОК";
+                case WEDNESDAY -> "СЕРЕДА";
+                case THURSDAY -> "ЧЕТВЕР";
+                case FRIDAY -> "П'ЯТНИЦЯ";
+                default -> "";
+            };
+
+            weekSchedule.append("<b>").append(dayName).append(":</b>\n");
+            for (ScheduleItem item : lessons) {
+                if (item.getSubject().isSelectiveSub() && !student.getSubjects().contains(item.getSubject())) {
+                    continue;
+                }
+                weekSchedule.append("<b>").append(item.getLessonNumber()).append(".</b> ").append(item.getSubject().getLessonName()).append("\n");
+
+            }
+            weekSchedule.append("\n");
+        }
+        return weekSchedule.toString();
+    }
+
+    @Transactional
     public String getScheduleForToday(Long chatId){
 
         Optional<Student> optStudent = studentRepo.findByChatId(chatId);
