@@ -28,8 +28,8 @@ public class ScheduleItem {
 
     public String toTelegramFormat(){
         StringBuilder scheduleItemInfo = new StringBuilder("------------------------------");
-        scheduleItemInfo.append("ID: <code>").append(getId()).append("</code>\n");
-        scheduleItemInfo.append("\nДень недели: ").append(getDayOfWeek()).append("\n");
+        scheduleItemInfo.append("\nID: <code>").append(getId()).append("</code>\n");
+        scheduleItemInfo.append("День недели: ").append(getDayOfWeek()).append("\n");
         scheduleItemInfo.append("Номер пары: ").append(getLessonNumber()).append("\n");
         scheduleItemInfo.append("Аудитория: ").append(getAuditory()).append("\n");
         scheduleItemInfo.append("Предмет: ").append(getSubject().getLessonName());
