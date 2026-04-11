@@ -76,14 +76,15 @@ public class AdminHandler {
 
         StringBuilder response = new StringBuilder("Привет, админ!\nДоступные команды:\n");
         response.append(AdminCommands.SHOW_STUDENTS).append(" - Показать всех студентов\n");
-        response.append(AdminCommands.ADD_STUDENT).append(" - Добавить студента\n");
-//        response.append(AdminCommands.DELETE_STUDENT).append(" - Удалить студента\n");
+        response.append(AdminCommands.SHOW_SCHEDULE).append(" - Показать расписание\n");
         response.append(AdminCommands.SHOW_SUBJECTS).append(" - Показать список предметов\n");
+        response.append(AdminCommands.ADD_STUDENT).append(" - Добавить студента\n");
         response.append(AdminCommands.ADD_SUBJECT).append(" - Добавить предмет\n");
-//        response.append(AdminCommands.DELETE_SUBJECT).append(" - Удалить предмет\n");
-        response.append(AdminCommands.EDIT_SUBJECT).append(" - Редактировать предмет\n");
         response.append(AdminCommands.ADD_SCHITEM).append(" - Добавить элемент расписания\n");
+        response.append(AdminCommands.EDIT_SUBJECT).append(" - Редактировать предмет\n");
         response.append(AdminCommands.BROADCAST).append(" - Разослать сообщение\n");
+        //        response.append(AdminCommands.DELETE_STUDENT).append(" - Удалить студента\n");
+        //        response.append(AdminCommands.DELETE_SUBJECT).append(" - Удалить предмет\n");
         return createMessage(tgId, response.toString());
 
     }

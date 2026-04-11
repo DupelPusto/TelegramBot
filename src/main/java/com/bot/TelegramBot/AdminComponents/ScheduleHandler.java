@@ -1,6 +1,7 @@
 package com.bot.TelegramBot.AdminComponents;
 
 import com.bot.TelegramBot.dto.HandlerResponseDto;
+import com.bot.TelegramBot.dto.PageDto;
 import com.bot.TelegramBot.entities.ScheduleItem;
 import com.bot.TelegramBot.entities.Subject;
 import com.bot.TelegramBot.repository.SubjectRepository;
@@ -10,8 +11,13 @@ import com.bot.TelegramBot.util.DateUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.time.DayOfWeek;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,16 +33,25 @@ public class ScheduleHandler implements Handleable{
     @Override
     public boolean canHandle(AdminState state, String text) {
         if (state.name().startsWith("SCHITEM")) return true;
+        if (state == AdminState.FREE && text.startsWith("SCHEDULE_PAGE_")) return true;
         return state == AdminState.FREE && text.startsWith("/schedule");
     }
 
     @Override
     public HandlerResponseDto handle(Long chatId, String text, AdminState state, Integer messageId) {
 
+        if (text.startsWith("SCHEDULE_PAGE_")){
+            int page = Integer.parseInt(text.replace("SCHEDULE_PAGE_", ""));
+            return editScheduleMessage(chatId, messageId, page);
+        }
+
         switch (state) {
             case FREE:
                 if (text.equals(AdminCommands.ADD_SCHITEM)){
                     return createSchItemStart(chatId);
+                }
+                if (text.equals(AdminCommands.SHOW_SCHEDULE)){
+                    return showScheduleItem(chatId);
                 }
                 break;
             case SCHITEM_WAITING_FOR_LESSON_NAME:
@@ -51,6 +66,33 @@ public class ScheduleHandler implements Handleable{
         return new HandlerResponseDto(createMessage(chatId, "Неизвестная ошибка, попробуй снова"), state);
     }
 
+    private HandlerResponseDto showScheduleItem(Long chatId){
+
+        int initPage = 0;
+        PageDto dto = scheduleService.showScheduleItems(initPage);
+
+        SendMessage sm = new SendMessage();
+        sm.setParseMode("HTML");
+        sm.setChatId(chatId);
+        sm.setText(dto.text());
+        InlineKeyboardMarkup keyboard = createInlineMarkupKeyboard(dto);
+        if (keyboard != null) sm.setReplyMarkup(keyboard);
+        return new HandlerResponseDto(sm, AdminState.FREE);
+    }
+
+    private HandlerResponseDto editScheduleMessage(Long tgId, Integer messageId, int page){
+        PageDto dto = scheduleService.showScheduleItems(page);
+
+        EditMessageText editMessageText = new EditMessageText();
+        editMessageText.setParseMode("HTML");
+        editMessageText.setMessageId(messageId);
+        editMessageText.setChatId(tgId);
+        editMessageText.setText(dto.text());
+
+        InlineKeyboardMarkup keyboard = createInlineMarkupKeyboard(dto);
+        if (keyboard != null) editMessageText.setReplyMarkup(keyboard);
+        return new HandlerResponseDto(editMessageText, AdminState.FREE);
+    }
 
     private HandlerResponseDto createSchItemStart(Long chatId){
 
@@ -115,6 +157,34 @@ public class ScheduleHandler implements Handleable{
         sm.setChatId(id);
         sm.setText(text);
         return sm;
+    }
+
+    private InlineKeyboardMarkup createInlineMarkupKeyboard(PageDto dto){
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine = new ArrayList<>();
+
+        if (dto.currentPage() > 0){
+            InlineKeyboardButton backButton = new InlineKeyboardButton();
+            backButton.setText("<--");
+            backButton.setCallbackData("SCHEDULE_PAGE_" + (dto.currentPage() - 1));
+            rowInLine.add(backButton);
+        }
+
+        if (dto.currentPage() < dto.totalPages() - 1){
+            InlineKeyboardButton nextButton = new InlineKeyboardButton();
+            nextButton.setText("-->");
+            nextButton.setCallbackData("SCHEDULE_PAGE_" + (dto.currentPage() + 1));
+            rowInLine.add(nextButton);
+        }
+
+        if (!rowInLine.isEmpty()){
+            rowsInLine.add(rowInLine);
+            inlineKeyboardMarkup.setKeyboard(rowsInLine);
+            return inlineKeyboardMarkup;
+        }
+
+        return null;
     }
 
 }
