@@ -8,6 +8,7 @@ class AdminCommands {
     static String SHOW_STUDENTS = "/student_show";
     static String SHOW_SUBJECTS = "/subject_show";
     static String EDIT_SUBJECT = "/edit_subject";
+    static String EDIT_SCHITEM = "/edit_schedule";
     static String ADD_SCHITEM = "/schedule_add";
     static String SHOW_SCHEDULE = "/schedule_show";
     static String SHOW_COMMANDS = "/++";
