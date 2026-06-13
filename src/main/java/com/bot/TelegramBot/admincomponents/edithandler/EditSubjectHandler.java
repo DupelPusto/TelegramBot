@@ -1,5 +1,8 @@
-package com.bot.TelegramBot.AdminComponents;
+package com.bot.TelegramBot.admincomponents.edithandler;
 
+import com.bot.TelegramBot.admincomponents.AdminCommands;
+import com.bot.TelegramBot.admincomponents.AdminState;
+import com.bot.TelegramBot.admincomponents.Handleable;
 import com.bot.TelegramBot.dto.HandlerResponseDto;
 import com.bot.TelegramBot.entities.Subject;
 import com.bot.TelegramBot.repository.SubjectRepository;
@@ -17,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @RequiredArgsConstructor
-public class EditSubjectHandler implements Handleable{
+public class EditSubjectHandler implements Handleable {
 
     private final SubjectRepository subjectRepo;
     private static Map<Long, Subject> editableSubjects = new ConcurrentHashMap<>();

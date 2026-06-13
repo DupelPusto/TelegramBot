@@ -1,6 +1,6 @@
 package com.bot.TelegramBot.dto;
 
-import com.bot.TelegramBot.AdminComponents.AdminState;
+import com.bot.TelegramBot.admincomponents.AdminState;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 

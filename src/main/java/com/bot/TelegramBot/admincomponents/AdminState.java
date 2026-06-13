@@ -1,4 +1,4 @@
-package com.bot.TelegramBot.AdminComponents;
+package com.bot.TelegramBot.admincomponents;
 
 public enum AdminState {
 

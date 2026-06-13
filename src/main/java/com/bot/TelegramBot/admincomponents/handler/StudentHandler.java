@@ -1,5 +1,8 @@
-package com.bot.TelegramBot.AdminComponents;
+package com.bot.TelegramBot.admincomponents.handler;
 
+import com.bot.TelegramBot.admincomponents.AdminCommands;
+import com.bot.TelegramBot.admincomponents.AdminState;
+import com.bot.TelegramBot.admincomponents.Handleable;
 import com.bot.TelegramBot.dto.HandlerResponseDto;
 import com.bot.TelegramBot.dto.PageDto;
 import com.bot.TelegramBot.entities.Student;
@@ -18,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @RequiredArgsConstructor
-public class StudentHandler implements Handleable{
+public class StudentHandler implements Handleable {
 
     private final SubjectRepository subjectRepo;
     private final StudentService studentService;

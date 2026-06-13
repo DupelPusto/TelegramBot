@@ -1,5 +1,8 @@
-package com.bot.TelegramBot.AdminComponents;
+package com.bot.TelegramBot.admincomponents.handler;
 
+import com.bot.TelegramBot.admincomponents.AdminCommands;
+import com.bot.TelegramBot.admincomponents.AdminState;
+import com.bot.TelegramBot.admincomponents.Handleable;
 import com.bot.TelegramBot.dto.HandlerResponseDto;
 import com.bot.TelegramBot.entities.Student;
 import com.bot.TelegramBot.repository.StudentRepository;
@@ -13,7 +16,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class BroadcastHandler implements Handleable{
+public class BroadcastHandler implements Handleable {
 
     private final StudentRepository studentRepo;
 

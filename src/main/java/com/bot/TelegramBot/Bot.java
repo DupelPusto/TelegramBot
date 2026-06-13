@@ -1,7 +1,7 @@
 package com.bot.TelegramBot;
 
-import com.bot.TelegramBot.AdminComponents.AdminHandler;
-import com.bot.TelegramBot.UserComponents.UserHandler;
+import com.bot.TelegramBot.admincomponents.handler.AdminHandler;
+import com.bot.TelegramBot.usercomponents.UserHandler;
 import com.bot.TelegramBot.dto.HandlerResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

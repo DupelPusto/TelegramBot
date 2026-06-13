@@ -1,4 +1,4 @@
-package com.bot.TelegramBot.UserComponents;
+package com.bot.TelegramBot.usercomponents;
 
 public enum UserState {
     FREE,

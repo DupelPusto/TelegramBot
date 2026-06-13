@@ -1,5 +1,8 @@
-package com.bot.TelegramBot.AdminComponents;
+package com.bot.TelegramBot.admincomponents.edithandler;
 
+import com.bot.TelegramBot.admincomponents.AdminCommands;
+import com.bot.TelegramBot.admincomponents.AdminState;
+import com.bot.TelegramBot.admincomponents.Handleable;
 import com.bot.TelegramBot.dto.HandlerResponseDto;
 import com.bot.TelegramBot.entities.ScheduleItem;
 import com.bot.TelegramBot.entities.Subject;
@@ -18,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @RequiredArgsConstructor
-public class EditScheduleItemHandler implements Handleable{
+public class EditScheduleItemHandler implements Handleable {
 
     private final ScheduleItemRepository scheduleRepo;
     private final SubjectRepository subjectRepo;

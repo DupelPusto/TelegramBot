@@ -1,6 +1,5 @@
-package com.bot.TelegramBot.UserComponents;
+package com.bot.TelegramBot.usercomponents;
 
-import com.bot.TelegramBot.repository.StudentRepository;
 import com.bot.TelegramBot.service.ScheduleService;
 import com.bot.TelegramBot.service.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.bot.TelegramBot.UserComponents.UserCommands.*;
+import static com.bot.TelegramBot.usercomponents.UserCommands.*;
 
 @Component
 @RequiredArgsConstructor

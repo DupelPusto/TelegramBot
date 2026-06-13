@@ -1,10 +1,11 @@
-package com.bot.TelegramBot.AdminComponents;
+package com.bot.TelegramBot.admincomponents.handler;
 
+import com.bot.TelegramBot.admincomponents.AdminCommands;
+import com.bot.TelegramBot.admincomponents.AdminState;
+import com.bot.TelegramBot.admincomponents.Handleable;
 import com.bot.TelegramBot.dto.HandlerResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
