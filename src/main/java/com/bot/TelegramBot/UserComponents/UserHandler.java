@@ -1,5 +1,6 @@
 package com.bot.TelegramBot.UserComponents;
 
+import com.bot.TelegramBot.repository.StudentRepository;
 import com.bot.TelegramBot.service.ScheduleService;
 import com.bot.TelegramBot.service.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ public class UserHandler {
 
     private final ScheduleService scheduleService;
     private final StudentService studentService;
+
     Map<Long, UserState> userStates = new ConcurrentHashMap<>();
 
     public SendMessage userHandler(Update update){
@@ -60,6 +62,7 @@ public class UserHandler {
 
     private SendMessage registerStudent(Update update){
         Long chatId = update.getMessage().getChatId();
+        if (studentService.isRegistered(chatId)) return createMessage(chatId, "Ты уже зарегистрирован!");
         userStates.put(chatId, UserState.WAITING_FOR_INVITE_CODE);
         String response = "Введи свой инвайт-код";
         return createMessage(chatId, response);

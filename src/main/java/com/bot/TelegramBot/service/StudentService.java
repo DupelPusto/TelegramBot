@@ -24,9 +24,9 @@ public class StudentService {
 
     private final StudentRepository studentRepo;
 
-
-
-
+    public boolean isRegistered(Long chatId){
+        return studentRepo.existsByChatId(chatId);
+    }
 
     @Transactional
     public PageDto showStudent(int pageNumber){

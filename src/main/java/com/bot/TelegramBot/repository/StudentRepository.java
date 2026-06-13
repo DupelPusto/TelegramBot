@@ -14,4 +14,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     List<Student> findAllByChatIdIsNotNull();
 
+    boolean existsByChatId(Long chatId);
+
+
 }
