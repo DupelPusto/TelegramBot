@@ -36,4 +36,15 @@ public class ScheduleItem {
         scheduleItemInfo.append("\n------------------------------");
         return scheduleItemInfo.toString();
     }
+
+    public String toEditFormat(){
+
+        StringBuilder schedule = new StringBuilder();
+        schedule.append("\nID: ").append(getId()).append("\n");
+        schedule.append("День недели: ").append(getDayOfWeek()).append("\n");
+        schedule.append("Номер пары: ").append(getLessonNumber()).append("\n");
+        schedule.append("Аудитория: ").append(getAuditory()).append("\n");
+        schedule.append("Предмет: ").append(getSubject().getLessonName());
+        return schedule.toString();
+    }
 }

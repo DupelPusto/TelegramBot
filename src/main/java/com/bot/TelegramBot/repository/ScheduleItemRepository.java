@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface ScheduleItemRepository extends JpaRepository<ScheduleItem,Long> {
 
-    List<ScheduleItem> findAllByDayOfWeek(DayOfWeek dayOfWeek);
+    List<ScheduleItem> findAllByDayOfWeekOrderByLessonNumberAsc(DayOfWeek dayOfWeek);
 
     Optional<ScheduleItem> findByDayOfWeekAndLessonNumber(DayOfWeek dayOfWeek, Integer lessonNumber);
 }

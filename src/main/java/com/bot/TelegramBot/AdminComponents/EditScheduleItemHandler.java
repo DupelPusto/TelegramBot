@@ -91,8 +91,6 @@ public class EditScheduleItemHandler implements Handleable{
         return new HandlerResponseDto(createMessage(chatId, "Неизвестная ошибка"), state);
     }
 
-
-
     private HandlerResponseDto editSchitemSubject(Long chatId, String text){
 
         Optional<Subject> subject = subjectRepo.findByLessonName(text);

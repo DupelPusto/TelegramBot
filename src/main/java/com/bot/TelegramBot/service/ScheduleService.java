@@ -5,7 +5,6 @@ import com.bot.TelegramBot.dto.PageDto;
 import com.bot.TelegramBot.entities.LessonTime;
 import com.bot.TelegramBot.entities.ScheduleItem;
 import com.bot.TelegramBot.entities.Student;
-import com.bot.TelegramBot.entities.Subject;
 import com.bot.TelegramBot.repository.ScheduleItemRepository;
 import com.bot.TelegramBot.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,7 +44,7 @@ public class ScheduleService {
 
             if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) continue;
 
-            List<ScheduleItem> lessons = scheduleRepo.findAllByDayOfWeek(dayOfWeek);
+            List<ScheduleItem> lessons = scheduleRepo.findAllByDayOfWeekOrderByLessonNumberAsc(dayOfWeek);
 
             if (lessons.isEmpty()) continue;
 
@@ -88,7 +86,7 @@ public class ScheduleService {
             return "Сегодня выходной, отдыхай";
         }
 
-        List<ScheduleItem> lessons = scheduleRepo.findAllByDayOfWeek(today);
+        List<ScheduleItem> lessons = scheduleRepo.findAllByDayOfWeekOrderByLessonNumberAsc(today);
         if (lessons.isEmpty()){
             return "На сегодня пар не найдено";
         }
@@ -123,7 +121,7 @@ public class ScheduleService {
             return "Сегодня выходной, отдыхай";
         }
 
-        List<ScheduleItem> lessons = scheduleRepo.findAllByDayOfWeek(today);
+        List<ScheduleItem> lessons = scheduleRepo.findAllByDayOfWeekOrderByLessonNumberAsc(today);
         if (lessons.isEmpty()){
             return "На сегодня пар не найдено";
         }
