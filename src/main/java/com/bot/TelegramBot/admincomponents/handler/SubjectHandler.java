@@ -51,6 +51,9 @@ public class SubjectHandler implements Handleable {
                 if (text.equals(AdminCommands.SHOW_SUBJECTS)){
                     return showSubject(chatId);
                 }
+                if (text.equals(AdminCommands.DELETE_SUBJECT)){
+                    return removeSubjectStart(chatId);
+                }
                 break;
             case LESSON_WAITING_FOR_NAME:
                 return createSubjectName(chatId, text);
@@ -60,6 +63,8 @@ public class SubjectHandler implements Handleable {
                 return createSubjectTeacher(chatId, text);
             case LESSON_WAITING_FOR_SELECTIVE:
                 return createSubjectFinish(chatId, text);
+            case LESSON_WAITING_FOR_NAME_DELETING:
+                return removeSubjectFinish(chatId, text);
 
         }
 
@@ -136,6 +141,16 @@ public class SubjectHandler implements Handleable {
 
         String responce = subjectService.addSubject(draftSubjects.get(chatId));
         draftSubjects.remove(chatId);
+        return new HandlerResponseDto(createMessage(chatId, responce), AdminState.FREE);
+    }
+
+    private HandlerResponseDto removeSubjectStart(Long chatId){
+        String responce = "Введи название предмета для удаления:";
+        return new HandlerResponseDto(createMessage(chatId, responce), AdminState.LESSON_WAITING_FOR_NAME_DELETING);
+    }
+
+    private HandlerResponseDto removeSubjectFinish(Long chatId, String text) {
+        String responce = subjectService.removeSubject(text);
         return new HandlerResponseDto(createMessage(chatId, responce), AdminState.FREE);
     }
 

@@ -161,6 +161,15 @@ public class ScheduleService {
         return stringBuilder.toString();
     }
 
+    @Transactional
+    public String removeItem(Long id){
+        Optional<ScheduleItem> item = scheduleRepo.findById(id);
+        if (item.isEmpty()) return "Элемент с таким ID не найден!";
+        ScheduleItem schitem = item.get();
+        scheduleRepo.delete(schitem);
+        return String.format("Элемент расписания с ID %d успешно удален!",id);
+    }
+
     public PageDto showScheduleItems(int pageNumber){
         int pageSize = 5;
 

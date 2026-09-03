@@ -82,11 +82,13 @@ public class AdminHandler {
         response.append(AdminCommands.ADD_STUDENT).append(" - Добавить студента\n");
         response.append(AdminCommands.ADD_SUBJECT).append(" - Добавить предмет\n");
         response.append(AdminCommands.ADD_SCHITEM).append(" - Добавить элемент расписания\n");
+        response.append(AdminCommands.EDIT_STUDENT).append(" - Редактировать студента");
         response.append(AdminCommands.EDIT_SUBJECT).append(" - Редактировать предмет\n");
         response.append(AdminCommands.EDIT_SCHITEM).append(" - Редактировать расписание\n");
         response.append(AdminCommands.BROADCAST).append(" - Разослать сообщение\n");
-        //        response.append(AdminCommands.DELETE_STUDENT).append(" - Удалить студента\n");
-        //        response.append(AdminCommands.DELETE_SUBJECT).append(" - Удалить предмет\n");
+        response.append(AdminCommands.DELETE_STUDENT).append(" - Удалить студента\n");
+        response.append(AdminCommands.DELETE_SUBJECT).append(" - Удалить предмет\n");
+        response.append(AdminCommands.DELETE_SCHITEM).append(" - Удалить элемент расписания\n");
         return createMessage(tgId, response.toString());
 
     }

@@ -12,4 +12,6 @@ public interface ScheduleItemRepository extends JpaRepository<ScheduleItem,Long>
     List<ScheduleItem> findAllByDayOfWeekOrderByLessonNumberAsc(DayOfWeek dayOfWeek);
 
     Optional<ScheduleItem> findByDayOfWeekAndLessonNumber(DayOfWeek dayOfWeek, Integer lessonNumber);
+
+    Optional<ScheduleItem> findById(Long id);
 }

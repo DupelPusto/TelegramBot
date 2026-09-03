@@ -47,4 +47,22 @@ public class Student {
         studentInfo.append("\n------------------------------");
         return studentInfo.toString();
     }
+
+    public String toEditFormat(){
+        StringBuilder studentInfo = new StringBuilder();
+        studentInfo.append("\nСтудент: ").append(getName()).append(" ").append(getSurname()).append("\n");
+        studentInfo.append("ID: ").append(getId()).append("\n");
+        studentInfo.append("Инвайт-код: ").append(getInviteCode()).append("\n");
+        studentInfo.append("Выборочные предметы: ");
+        if (getSubjects() == null || getSubjects().isEmpty()) {
+            studentInfo.append("отсутствуют");
+        } else {
+            for (Subject s : getSubjects()) {
+                if (s != null) {
+                    studentInfo.append(s.getLessonName()).append(" ");
+                }
+            }
+        }
+        return studentInfo.toString();
+    }
 }

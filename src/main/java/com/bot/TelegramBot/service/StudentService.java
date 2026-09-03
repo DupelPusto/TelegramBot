@@ -87,4 +87,16 @@ public class StudentService {
         return "Несуществующий инвайт-код. Попробуй снова или обратись к администратору";
     }
 
+    public List<Student> getStudents(){
+        return studentRepo.findAll();
+    }
+
+    public String removeStudent(Long id){
+        Optional<Student> st = studentRepo.findById(id);
+        if (st.isEmpty()) return "Студент с таким ID не найден";
+        Student student = st.get();
+        studentRepo.delete(student);
+        return String.format("Студент %s %s успешно удален", student.getName(), student.getSurname());
+    }
+
 }

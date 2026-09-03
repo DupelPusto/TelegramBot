@@ -10,6 +10,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     Optional<Student> findByChatId(Long chatId);
 
+    Optional<Student> findById(Long id);
+
     Optional<Student> findByInviteCode(String inviteCode);
 
     List<Student> findAllByChatIdIsNotNull();

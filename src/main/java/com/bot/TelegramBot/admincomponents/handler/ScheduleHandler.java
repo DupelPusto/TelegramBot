@@ -56,6 +56,9 @@ public class ScheduleHandler implements Handleable {
                 if (text.equals(AdminCommands.SHOW_SCHEDULE)){
                     return showScheduleItem(chatId);
                 }
+                if (text.equals(AdminCommands.DELETE_SCHITEM)){
+                    return removeScheduleItemStart(chatId);
+                }
                 break;
             case SCHITEM_WAITING_FOR_LESSON_NAME:
                 return createSchItemName(chatId, text);
@@ -152,6 +155,17 @@ public class ScheduleHandler implements Handleable {
         draftSItems.get(chatId).setDayOfWeek(day);
         String response = scheduleService.addScheduleItem(draftSItems.get(chatId));
         draftSItems.remove(chatId);
+        return new HandlerResponseDto(createMessage(chatId, response), AdminState.FREE);
+    }
+
+    private HandlerResponseDto removeScheduleItemStart(Long chatId){
+        String response = "Введи ID элемента расписания для удаления:";
+        return new HandlerResponseDto(createMessage(chatId, response), AdminState.SCHITEM_WAITING_FOR_ID_DELETING);
+    }
+
+    private HandlerResponseDto removeScheduleItemFinish(Long chatId, String text){
+        Long id = Long.parseLong(text);
+        String response = scheduleService.removeItem(id);
         return new HandlerResponseDto(createMessage(chatId, response), AdminState.FREE);
     }
 

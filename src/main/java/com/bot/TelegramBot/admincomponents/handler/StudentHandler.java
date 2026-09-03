@@ -10,6 +10,7 @@ import com.bot.TelegramBot.entities.Subject;
 import com.bot.TelegramBot.repository.SubjectRepository;
 import com.bot.TelegramBot.service.StudentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -49,6 +50,9 @@ public class StudentHandler implements Handleable {
                 if (text.equals(AdminCommands.SHOW_STUDENTS)){
                     return showStudents(chatId);
                 }
+                if (text.equals(AdminCommands.DELETE_STUDENT)){
+                    return removeStudentStart(chatId);
+                }
                 break;
             case STUDENT_WAITING_FOR_NAME:
                 return createStudentName(chatId, text);
@@ -58,6 +62,8 @@ public class StudentHandler implements Handleable {
                 return createStudentInviteCode(chatId, text);
             case STUDENT_WAITING_FOR_SUBJECTS:
                 return createStudentFinish(chatId, text);
+            case STUDENT_WAITING_FOR_ID_DELETING:
+                return removeStudentFinish(chatId, text);
 
         }
         return new HandlerResponseDto(createMessage(chatId, "Неизвестная ошибка, попробуй снова"), state);
@@ -147,6 +153,17 @@ public class StudentHandler implements Handleable {
         }
 
 
+        return new HandlerResponseDto(createMessage(chatId, response), AdminState.FREE);
+    }
+
+    private HandlerResponseDto removeStudentStart(Long chatId){
+        String response = "Введи ID студента для удаления:";
+        return new HandlerResponseDto(createMessage(chatId, response), AdminState.STUDENT_WAITING_FOR_ID_DELETING);
+    }
+
+    private HandlerResponseDto removeStudentFinish(Long chatId, String text){
+        Long id = Long.parseLong(text);
+        String response = studentService.removeStudent(id);
         return new HandlerResponseDto(createMessage(chatId, response), AdminState.FREE);
     }
 

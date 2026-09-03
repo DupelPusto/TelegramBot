@@ -11,7 +11,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 public class SubjectService {
 
     private final SubjectRepository subjectRepo;
+    private final StudentService studentService;
 
     public String addSubject(Subject subject){
         subjectRepo.save(subject);
@@ -52,5 +56,25 @@ public class SubjectService {
                 "📋 Список предметов:\n" + subjects,
                 subjectPage.getTotalPages(),
                 pageNumber);
+    }
+
+    @Transactional
+    public String removeSubject(String subjectName){
+        Optional<Subject> sub = subjectRepo.findByLessonName(subjectName);
+        if (sub.isEmpty()){
+            return "Предмет с таким названием не найден!";
+        }
+        Subject subject = sub.get();
+        List<Student> students = studentService.getStudents();
+        for (Student s : students){
+            Set<Subject> subjects = s.getSubjects();
+            for (Subject subj : subjects){
+                if (subjectName.equals(subj.getLessonName())){
+                    subjects.remove(subj);
+                }
+            }
+        }
+        subjectRepo.delete(subject);
+        return String.format("Предмет %s успешно удален!", subject.getLessonName());
     }
 }

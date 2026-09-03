@@ -162,11 +162,10 @@ public class EditScheduleItemHandler implements Handleable {
         ScheduleItem s = editableItem.get();
         editableItems.put(chatId, s);
 
-        String response = String.format("Элемент расписания: %s%nВыбери для редактирования", s.toTelegramFormat());
+        String response = String.format("Элемент расписания: %s%nВыбери для редактирования", s.toEditFormat());
         SendMessage sm = new SendMessage();
         sm.setChatId(chatId);
         sm.setText(response);
-        sm.setParseMode("HTML");
         sm.setReplyMarkup(createMarkupKeyboard(id));
 
         return new HandlerResponseDto(sm, AdminState.FREE);
